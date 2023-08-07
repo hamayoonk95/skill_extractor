@@ -5,20 +5,19 @@ from sqlalchemy.orm import sessionmaker
 
 from config import DRIVER_NAME, MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, DATABASE_NAME
 
-# Create SQLAlchemy engine to connect to MySQL
-mysql_engine = create_engine(
-    URL(
+# Create an engine without a database
+engine_without_db = create_engine(
+    URL.create(
         drivername=DRIVER_NAME,
         username=MYSQL_USER,
         password=MYSQL_PASSWORD,
-        host=MYSQL_HOST
+        host=MYSQL_HOST,
     )
 )
 
-# Create database if it doesn't exist
-with mysql_engine.connect() as connection:
+# Create the database if it doesn't exist
+with engine_without_db.connect() as connection:
     connection.execute(text(f"CREATE DATABASE IF NOT EXISTS {DATABASE_NAME}"))
-    connection.execute(text(f"USE {DATABASE_NAME}"))
 
 url = URL.create(
     drivername=DRIVER_NAME,
@@ -31,9 +30,27 @@ url = URL.create(
 db_engine = create_engine(url)
 
 # Create SQLAlchemy session bound to the database engine
-SessionLocal = sessionmaker(autoflush=False, autocomit=False, bind=db_engine)
+SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=db_engine)
 
 # Base class for declarative model definitions
 Base = declarative_base()
 
+
+# Import models after the Base has been created
+from database.models.job_posting import JobPostings
+from database.models.job_roles import JobRoles
+from database.models.skill_types import SkillTypes
+from database.models.skills import Skills
+from database.models.role_skills import RoleSkills
+
+def create_session():
+    return SessionLocal()
+
+
+def add_instance(session, instance):
+    session.add(instance)
+    session.commit()
+
+
+# Create all the models in the database
 Base.metadata.create_all(bind=db_engine)
