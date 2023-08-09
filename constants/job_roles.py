@@ -1,4 +1,3 @@
-
 job_roles = [
     {'role_title': 'Software Developer', 'query': 'Software (Developer OR Engineer)'},
     {'role_title': 'Frontend Developer', 'query': '(Frontend OR Front-End) (Developer OR Engineer)'},

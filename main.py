@@ -1,31 +1,82 @@
+import random
 
+from selenium.webdriver.chrome.options import Options
+import undetected_chromedriver as uc
+import spacy
+
+from constants.user_agents import user_agent_list
+from constants.job_roles import job_roles
+
+# Import models and session from db setup
 from database.db_setup import create_session, add_instance
-# Import models after the Base has been created
 from database.models.job_posting import JobPostings
 from database.models.job_roles import JobRoles
+from database.models.role_skills import RoleSkills
 from database.models.skill_types import SkillTypes
 from database.models.skills import Skills
-from database.models.role_skills import RoleSkills
+
+from scraping.indeed_scraper import IndeedScraper
+from processing.data_processor import DataProcessor
 
 
 def main():
     # create a new session
     session = create_session()
+    model = spacy.load("./ner_model_training/model")
+    # Define WebDriver
+    options = Options()
+    options.add_argument(f"user-agent={random.choice(user_agent_list)}")
+    driver = uc.Chrome(use_subprocess=True, options=options)
+    indeed_scraper = IndeedScraper(driver)
+    indeed_processor = DataProcessor(model)
 
-    # dummy data
-    # skill_type = SkillTypes(type_name='Programming Language')
-    # add_instance(session, skill_type)
-    # skill = Skills(skill_name='Python', type_id=skill_type.id)
-    # add_instance(session, skill)
-    # role = JobRoles(role_title='FRONT Developer')
-    # add_instance(session, role)
-    # print(role.id)
-    # role_skill = RoleSkills(role_id=role.id, skill_id=skill.id, frequency=30)
-    # add_instance(session, role_skill)
-    # job_posting = JobPostings(job_title='LOOOOVEOEOEOE' ,job_description='sadfasdf dfvsdfg', role_id=role.id)
-    # add_instance(session, job_posting)
+    for job_role in job_roles:
+        role_title = job_role['role_title']
+        role_query = job_role['query']
+
+        # Add or get job_role from database
+        db_role = session.query(JobRoles).filter_by(role_title=role_title).first()
+        if db_role is None:
+            db_role = JobRoles(role_title=role_title)
+            add_instance(session, db_role)
+
+        # for page_number in range(0, 11, 10):
+        job_links = indeed_scraper.indeed_extractor(0, role_query)
+
+        for link in job_links:
+            scraped_jobs = indeed_scraper.get_job_data(link)
+            processed_jobs = indeed_processor.extract_job_data(scraped_jobs)
+            # print(processed_jobs)
+
+            existing_job = session.query(JobPostings).filter_by(job_description=processed_jobs['description'])
+            if not existing_job:
+                job_posting = JobPostings(job_title=processed_jobs['title'],
+                                          job_description=processed_jobs['description'],
+                                          role_id=db_role.id)
+                add_instance(session, job_posting)
+
+            for skill, skill_type in processed_jobs['skills']:
+                existing_skill_type = session.query(SkillTypes).filter_by(type_name=skill_type).first()
+                if not existing_skill_type:
+                    existing_skill_type = SkillTypes(type_name=skill_type)
+                    add_instance(session, existing_skill_type)
+
+                existing_skill = session.query(Skills).filter_by(skill_name=skill).first()
+                if not existing_skill:
+                    existing_skill = Skills(skill_name=skill, type_id=existing_skill_type.id)
+                    add_instance(session, existing_skill)
+
+                existing_role_skill = session.query(RoleSkills).filter_by(role_id=db_role.id,
+                                                                          skill_id=existing_skill.id).first()
+                if existing_role_skill:
+                    existing_role_skill.frequency += 1
+                else:
+                    role_skill = RoleSkills(role_id=db_role.id, skill_id=existing_skill.id, frequency=1)
+                    add_instance(session, role_skill)
 
     session.close()
+    driver.quit()
+
 
 if __name__ == "__main__":
     main()

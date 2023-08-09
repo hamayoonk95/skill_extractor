@@ -19,7 +19,7 @@ libraries = ['ASP.NET', 'jQuery', 'RxJS', 'NLTK', 'PyTorch', 'Semantic UI', 'Les
              'Chakra UI', 'p5js', 'Pygame', 'OpenAI Gym', 'BeautifulSoup', 'Spring Boot', 'Flask', 'PyQt', 'PIL',
              'Jinja2', 'Socket.IO', 'A-frame', 'Django', 'Vue.js', 'Numpy', 'PostgreSQL', 'Tensorflow.js',
              'Scikit-image', 'Pymongo', 'SQLAlchemy', 'Qt', 'PySpark', 'Tkinter', 'Kivy', 'Requests', 'Dash',
-             'Flask-SQLAlchemy', 'Flask-WTF', 'WebGL', 'gRPC', 'PostCSS', 'Vuetify', 'Vue', 'VuePress', 'rxjava', 'babel']
+             'Flask-SQLAlchemy', 'Flask-WTF', 'WebGL', 'gRPC', 'PostCSS', 'Vuetify', 'Vue', 'VuePress', 'rxjava', 'Babel']
 
 tools = ['Airflow', 'Pytest', 'Postman', 'Vault', 'Lucidchart', 'Insomnia', 'Lighthouse', 'Adobe FrameMaker', 'Next.js',
          'Varnish', 'Kafka', 'BigQuery', 'MadCap Flare', 'Jira', 'BitBucket', 'MLflow', 'VXLAN', 'JTAG',

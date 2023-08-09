@@ -51,6 +51,11 @@ def add_instance(session, instance):
     session.add(instance)
     session.commit()
 
+def get_job_descriptions(session):
+    results = session.execute(text("SELECT job_description FROM job_postings WHERE job_description IS NOT NULL AND job_description != '';"))
+    descriptions = [row[0] for row in results]
+    return descriptions
+
 
 # Create all the models in the database
 Base.metadata.create_all(bind=db_engine)
