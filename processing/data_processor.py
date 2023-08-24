@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-
+from ner_model_training.util import cleanse_data, replace_aliases
+from constants.skills_list1 import aliases
 
 class DataProcessor:
     def __init__(self, model):
@@ -19,9 +20,15 @@ class DataProcessor:
         job_description_div = soup.find('div', id="jobDescriptionText")
         if job_description_div:
             job_description_text = " ".join(job_description_div.stripped_strings)
+
+        job_description_text = job_description_text.lower()
+
+        cleansed_data = cleanse_data(job_description_text)
+        processed_text = replace_aliases(cleansed_data, aliases)
+
         found_skills = set()
 
-        doc = self.model(job_description_text.lower())
+        doc = self.model(processed_text)
         for ent in doc.ents:
             found_skills.add((ent.text, ent.label_))
 

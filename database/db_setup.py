@@ -3,7 +3,7 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from config import DRIVER_NAME, MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, DATABASE_NAME
+from database.config import DRIVER_NAME, MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, DATABASE_NAME
 
 # Create an engine without a database
 engine_without_db = create_engine(
@@ -37,11 +37,7 @@ Base = declarative_base()
 
 
 # Import models after the Base has been created
-from database.models.job_posting import JobPostings
-from database.models.job_roles import JobRoles
-from database.models.skill_types import SkillTypes
-from database.models.skills import Skills
-from database.models.role_skills import RoleSkills
+from database.models import job_roles, job_posting, skills, skill_types, role_skills
 
 def create_session():
     return SessionLocal()

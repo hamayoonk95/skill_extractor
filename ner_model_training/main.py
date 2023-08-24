@@ -18,8 +18,10 @@ session = create_session()
 
 if not os.path.exists(json_file_path):
     descriptions = get_job_descriptions(session)
+
     TRAIN_DATA = [generate_training_data(description) for description in descriptions]
     write_training_data_to_jsonl(TRAIN_DATA, json_file_path)
+    TRAIN_DATA = load_training_data_from_jsonl(json_file_path)
 else:
     TRAIN_DATA = load_training_data_from_jsonl(json_file_path)
 
@@ -28,7 +30,7 @@ else:
 start_time = datetime.datetime.now()
 
 # Train the spaCy model
-nlp = train_spacy_model(TRAIN_DATA,model_path, output_dir, n_iter=100)
+nlp = train_spacy_model(TRAIN_DATA, model_path, output_dir, n_iter=20)
 # Record the end time
 end_time = datetime.datetime.now()
 

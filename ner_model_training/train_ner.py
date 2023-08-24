@@ -31,7 +31,8 @@ def train_spacy_model(training_data, model_path=None, output_dir=None ,n_iter=10
     with nlp.disable_pipes(*other_pipes):  # only train NER
         # reset and initialize the weights randomly
 
-        nlp.begin_training()
+        if not (model_path and Path(model_path).exists()):
+            nlp.begin_training()
         for itn in range(n_iter):
             random.shuffle(training_data)
             losses = {}
