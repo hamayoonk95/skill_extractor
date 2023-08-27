@@ -1,6 +1,7 @@
 import random
 
 from selenium.webdriver.chrome.options import Options
+from seleniumbase import Driver
 import undetected_chromedriver as uc
 import spacy
 
@@ -22,11 +23,12 @@ from processing.data_processor import DataProcessor
 def main():
     # create a new session
     session = create_session()
-    model = spacy.load("./ner_model_training/model")
+    model = spacy.load("./ner_model_training/model/epoch_20")
     # Define WebDriver
     options = Options()
     options.add_argument(f"user-agent={random.choice(user_agent_list)}")
-    driver = uc.Chrome(use_subprocess=True, options=options)
+    driver = Driver(uc=True)
+
     indeed_scraper = IndeedScraper(driver)
     indeed_processor = DataProcessor(model)
 
@@ -46,10 +48,10 @@ def main():
         for link in job_links:
             scraped_jobs = indeed_scraper.get_job_data(link)
             processed_jobs = indeed_processor.extract_job_data(scraped_jobs)
-            # print(processed_jobs)
+            print(processed_jobs)
 
-            existing_job = session.query(JobPostings).filter_by(job_description=processed_jobs['description'])
-            if not existing_job:
+            existing_job = session.query(JobPostings).filter_by(job_description=processed_jobs['description']).first()
+            if existing_job is None:
                 job_posting = JobPostings(job_title=processed_jobs['title'],
                                           job_description=processed_jobs['description'],
                                           role_id=db_role.id)
@@ -57,12 +59,12 @@ def main():
 
             for skill, skill_type in processed_jobs['skills']:
                 existing_skill_type = session.query(SkillTypes).filter_by(type_name=skill_type).first()
-                if not existing_skill_type:
+                if existing_skill_type is None:
                     existing_skill_type = SkillTypes(type_name=skill_type)
                     add_instance(session, existing_skill_type)
 
                 existing_skill = session.query(Skills).filter_by(skill_name=skill).first()
-                if not existing_skill:
+                if existing_skill is None:
                     existing_skill = Skills(skill_name=skill, type_id=existing_skill_type.id)
                     add_instance(session, existing_skill)
 
