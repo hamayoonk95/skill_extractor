@@ -60,64 +60,6 @@ def generate_training_data(description):
         return {"text": description, "label": []}
 
 
-def cleanse_data(text):
-
-    text = text.lower()
-    # Remove any extra spaces, replace multiple spaces with a single space
-    text = re.sub(r'\s+', ' ', text)
-
-    # Handle cases where terms are separated by slashes without spaces "react/vue/angular"
-    text = re.sub(r'\/', ' / ', text)
-
-    # Handle cases where terms are separated by commas without spaces "java,python,ruby"
-    text = re.sub(r'\,', ' , ', text)
-
-    # Replace multiple spaces again in case new spaces were added
-    text = re.sub(r'\s+', ' ', text).strip()
-
-    return text
-
-
-def replace_aliases(description, aliases):
-    words = description.split()
-    i = 0
-    updated_words = []
-
-    special_chars = ",./-)("
-
-    while i < len(words):
-        longest_match = ""
-        replacement = ""
-
-        # Loop through all the aliases
-        for canonical, alias_list in aliases.items():
-            for alias in alias_list:
-                alias_words = alias.split()
-
-                # If there's a potential match
-                if i + len(alias_words) <= len(words):
-                    match = True
-                    for j in range(len(alias_words)):
-                        if words[i + j].strip(special_chars).lower() != alias_words[j].lower():
-                            match = False
-                            break
-
-                    # Replace with the longest matching canonical term
-                    if match and len(alias_words) > len(longest_match.split()):
-                        longest_match = alias
-                        replacement = canonical  # Not converting to lowercase here to maintain original format
-
-        # If we found a match, replace it
-        if longest_match:
-            updated_words.append(replacement)
-            i += len(longest_match.split())
-        else:
-            updated_words.append(words[i])
-            i += 1
-
-    return ' '.join(updated_words)
-
-
 def write_training_data_to_jsonl(training_data, jsonl_file_path):
     with open(jsonl_file_path, 'w', encoding='utf-8') as file:
         for data in training_data:

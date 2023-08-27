@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-from ner_model_training.util import cleanse_data, replace_aliases
-from constants.skills_list import aliases
+from constants.skills_list import reverse_aliases
 
 class DataProcessor:
     def __init__(self, model):
@@ -23,14 +22,12 @@ class DataProcessor:
 
         job_description_text = job_description_text.lower()
 
-        cleansed_data = cleanse_data(job_description_text)
-        processed_text = replace_aliases(cleansed_data, aliases)
-
         found_skills = set()
 
-        doc = self.model(processed_text)
+        doc = self.model(job_description_text)
         for ent in doc.ents:
-            found_skills.add((ent.text, ent.label_))
+            standard_term = reverse_aliases.get(ent.text, ent.text)
+            found_skills.add((standard_term, ent.label_))
 
         job_data = {
             'title': job_title,

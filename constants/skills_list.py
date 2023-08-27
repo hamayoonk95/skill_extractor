@@ -326,3 +326,9 @@ aliases = {'java': ['java', 'javac'],
            'no-sql': ['no-sql', 'no sql', 'nosql'],
            'svn': ['subversion'],
            }
+
+
+reverse_aliases = {}
+for key, values in aliases.items():
+    for value in values:
+        reverse_aliases[value.lower()] = key.lower()
