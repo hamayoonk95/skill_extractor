@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 
 from database.db_setup import get_job_descriptions, create_session
 from ner_model_training.util import generate_training_data, write_training_data_to_jsonl, load_training_data_from_jsonl
@@ -8,8 +9,8 @@ from ner_model_training.train_ner import train_spacy_model
 
 # Specify the path to the JSON file
 json_file_path = "./training_data.jsonl"
-model_path = "./model"
-output_dir = "./model"
+model_path = "./models"
+output_dir = "./models"
 
 
 # Create a new session
@@ -18,7 +19,7 @@ session = create_session()
 
 if not os.path.exists(json_file_path):
     descriptions = get_job_descriptions(session)
-
+    random.shuffle(descriptions)
     TRAIN_DATA = [generate_training_data(description) for description in descriptions]
     write_training_data_to_jsonl(TRAIN_DATA, json_file_path)
     TRAIN_DATA = load_training_data_from_jsonl(json_file_path)
@@ -64,4 +65,41 @@ print("Training completed in: ", time_diff)
 #         print(f"Tags: {tags}")
 #
 # print(f"Misaligned entities: {misaligned_entities}")
+
+
+
+
+
+
+# import json
+# import spacy
+# from spacy.training import offsets_to_biluo_tags
+# from spacy.tokens import Doc
+#
+# nlp = spacy.blank('en')
+#
+# # Function to write inconsistent training data to JSONL file
+# def write_inconsistent_data_to_jsonl(misaligned_data, output_filename="inconsistent_data.jsonl"):
+#     with open(output_filename, 'w') as f:
+#         for data in misaligned_data:
+#             text = data["text"]
+#             label = data["label"]["entities"]  # Modify this based on how your 'label' is structured
+#             output_data = {"text": text, "label": label}
+#             f.write(json.dumps(output_data) + '\n')
+#
+# misaligned_data = []
+# correct_data = []
+#
+# for text, annotations in TRAIN_DATA:
+#     doc = nlp.make_doc(text)
+#     tags = offsets_to_biluo_tags(doc, annotations['entities'])
+#
+#     if '-' in tags:  # Misaligned entities are represented as '-'
+#         misaligned_data.append({'text': text, 'label': annotations})
+#     else:
+#         correct_data.append({'text': text, 'label': annotations})
+#
+# print(misaligned_data)
+# write_inconsistent_data_to_jsonl(misaligned_data)
+# write_inconsistent_data_to_jsonl(correct_data, 'main_training_data1.jsonl')
 

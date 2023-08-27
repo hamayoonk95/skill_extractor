@@ -1,6 +1,6 @@
 import json
 import re
-from constants.skills_list1 import languages, libraries, tools, methodologies, platforms, aliases
+from constants.skills_list import languages, libraries, tools, methodologies, platforms, aliases
 
 # This is used to label the entities correctly
 skill_categories = {**dict.fromkeys(languages, 'LANGUAGE'),
@@ -9,8 +9,19 @@ skill_categories = {**dict.fromkeys(languages, 'LANGUAGE'),
                     **dict.fromkeys(methodologies, 'METHODOLOGY'),
                     **dict.fromkeys(platforms, 'PLATFORM')}
 
+# Create a lower-case mapping for matching against alias keys
+skill_categories_lower = {k.lower(): v for k, v in skill_categories.items()}
+
+
+# Add aliases to skill_categories
+for canonical, aliases in aliases.items():
+    category = skill_categories_lower.get(canonical.lower())
+    if category:
+        for alias in aliases:
+            skill_categories_lower[alias] = category
+
 # Sort all_skills in descending order of skill length, so longer skills are prioritized
-skills = sorted(skill_categories.items(), key=lambda x: len(x[0]), reverse=True)
+skills = sorted(skill_categories_lower.items(), key=lambda x: len(x[0]), reverse=True)
 count = 0
 
 
@@ -18,16 +29,24 @@ def generate_training_data(description):
     global count
     count += 1
 
-    description = cleanse_data(description)
-    description = replace_aliases(description, aliases)
+    description = description.lower()
 
     entities = []
     matched_chars = [False] * len(description)
 
     for skill, category in skills:
-        pattern = r'(?<![A-Za-z0-9&])' + re.escape(skill.lower()) + r'(?![A-Za-z0-9#+-_&])'
+        # if skill is "r", we'll add an additional condition to avoid matching "R" in "R&D"
+        if skill.lower() == "r":
+            pattern = r'(\b|\s|[,.();])' + re.escape(skill.lower()) + r'(?![&d])' + r'(\b|\s|[,.();])'
+        # if skill is "c++", we'll add additional conditions to properly escape and match the "++"
+        elif skill.lower() == "c++":
+            pattern = r'(\b|\s|[,.();])' + "c\+\+" + r'(\b|\s|[,.();])'
+        else:
+            pattern = r'(\b|\s|[,.();])' + re.escape(skill.lower()) + r'(\b|\s|[,.();])'
         for match in re.finditer(pattern, description):
             start, end = match.span()
+            start += len(match.group(1))  # Adjust start index to exclude preceding boundary
+            end -= len(match.group(2))  # Adjust end index to exclude following boundary
 
             if not any(matched_chars[start:end]):
                 entities.append((start, end, category))

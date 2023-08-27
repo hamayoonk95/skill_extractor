@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from ner_model_training.util import cleanse_data, replace_aliases
-from constants.skills_list1 import aliases
+from constants.skills_list import aliases
 
 class DataProcessor:
     def __init__(self, model):

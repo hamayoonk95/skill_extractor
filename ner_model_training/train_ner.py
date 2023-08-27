@@ -1,3 +1,5 @@
+import os
+
 import spacy
 import random
 from spacy.util import minibatch, compounding
@@ -6,13 +8,18 @@ from pathlib import Path
 
 
 def train_spacy_model(training_data, model_path=None, output_dir=None ,n_iter=100):
-    nlp = None
-    if model_path and Path(model_path).exists():
-        nlp = spacy.load(model_path)
-        print("Loaded model")
+
+    latest_epoch_dir = get_latest_epoch_dir(output_dir)
+
+    if latest_epoch_dir:
+        print(f"Resuming training from {latest_epoch_dir}")
+        nlp = spacy.load(latest_epoch_dir)
+        start_epoch = int(latest_epoch_dir.name.split('_')[1])
     else:
-        nlp = spacy.blank("en")  # create blank Language class
-        print("Created blank 'en' model")
+        # Initialize NLP object, if no model path provided
+        nlp = spacy.blank("en")
+        start_epoch = 0
+
 
     # create the built-in pipeline components and add them to the pipeline
     # nlp.create_pipe works for built-ins that are registered with spaCy
@@ -31,9 +38,9 @@ def train_spacy_model(training_data, model_path=None, output_dir=None ,n_iter=10
     with nlp.disable_pipes(*other_pipes):  # only train NER
         # reset and initialize the weights randomly
 
-        if not (model_path and Path(model_path).exists()):
+        if not latest_epoch_dir:
             nlp.begin_training()
-        for itn in range(n_iter):
+        for itn in range(start_epoch, n_iter):
             random.shuffle(training_data)
             losses = {}
             # batch up the examples using spaCy's minibatch
@@ -46,15 +53,35 @@ def train_spacy_model(training_data, model_path=None, output_dir=None ,n_iter=10
                     drop=0.5,  # dropout - make it harder to memorise data
                     losses=losses,
                 )
-            print("Losses", losses)
+            print(f"Epoch {itn + 1}, Losses", losses)
 
+            # Save model after each epoch to output directory
+            if output_dir is not None:
+                epoch_output_dir = Path(output_dir) / f"epoch_{itn + 1}"
+                if not epoch_output_dir.exists():
+                    epoch_output_dir.mkdir(parents=True)
+                nlp.to_disk(epoch_output_dir)
+                print(f"Saved model for epoch {itn + 1} to {epoch_output_dir}")
 
-    # save model to output directory
-    if output_dir is not None:
-        output_dir = Path(output_dir)
-        if not output_dir.exists():
-            output_dir.mkdir()
-        nlp.to_disk(output_dir)
-        print(f"Saved model to {output_dir}")
+    # # save model to output directory
+    # if output_dir is not None:
+    #     output_dir = Path(output_dir)
+    #     if not output_dir.exists():
+    #         output_dir.mkdir()
+    #     nlp.to_disk(output_dir)
+    #     print(f"Saved model to {output_dir}")
 
     return nlp
+
+
+def get_latest_epoch_dir(output_dir):
+    if not os.path.exists(output_dir):
+        return None
+
+    epoch_dirs = [d for d in os.listdir(output_dir) if d.startswith("epoch_")]
+    epoch_dirs.sort(key=lambda x: int(x.split('_')[1]))
+
+    if epoch_dirs:
+        return Path(output_dir) / epoch_dirs[-1]
+    else:
+        return None
