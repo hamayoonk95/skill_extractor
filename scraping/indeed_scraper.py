@@ -45,6 +45,6 @@ class IndeedScraper:
 
     def get_job_data(self, job_link):
         self.driver.get(job_link)
-        time.sleep(random.randint(2, 4))  # delay to prevent getting blocked by the website
+        time.sleep(random.randint(0,1))  # delay to prevent getting blocked by the website
         job_data = self.driver.page_source  # store the entire page source
         return job_data

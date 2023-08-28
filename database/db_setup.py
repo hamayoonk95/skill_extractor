@@ -39,19 +39,6 @@ Base = declarative_base()
 # Import models after the Base has been created
 from database.models import job_roles, job_posting, skills, skill_types, role_skills
 
-def create_session():
-    return SessionLocal()
-
-
-def add_instance(session, instance):
-    session.add(instance)
-    session.commit()
-
-def get_job_descriptions(session):
-    results = session.execute(text("SELECT job_description FROM job_postings WHERE job_description IS NOT NULL AND job_description != '';"))
-    descriptions = [row[0] for row in results]
-    return descriptions
-
 
 # Create all the models in the database
 Base.metadata.create_all(bind=db_engine)

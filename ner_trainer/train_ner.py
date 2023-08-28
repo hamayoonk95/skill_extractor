@@ -63,14 +63,6 @@ def train_spacy_model(training_data, model_path=None, output_dir=None ,n_iter=10
                 nlp.to_disk(epoch_output_dir)
                 print(f"Saved model for epoch {itn + 1} to {epoch_output_dir}")
 
-    # # save model to output directory
-    # if output_dir is not None:
-    #     output_dir = Path(output_dir)
-    #     if not output_dir.exists():
-    #         output_dir.mkdir()
-    #     nlp.to_disk(output_dir)
-    #     print(f"Saved model to {output_dir}")
-
     return nlp
 
 
