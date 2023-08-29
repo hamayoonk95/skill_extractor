@@ -29,7 +29,7 @@ from ner_trainer.train_ner import train_spacy_model
 def scrape_and_process_data(session, model_path):
     # load ner model
     model = spacy.load(model_path)
-    i = 0
+
     # Define WebDriver
     options = Options()
     options.add_argument(f"user-agent={random.choice(user_agent_list)}")
@@ -54,8 +54,7 @@ def scrape_and_process_data(session, model_path):
             for link in job_links:
                 scraped_jobs = indeed_scraper.get_job_data(link)
                 processed_jobs = indeed_processor.extract_job_data(scraped_jobs)
-                print(f"{i}: {processed_jobs}")
-                i += 1
+
                 existing_job = session.query(JobPostings).filter_by(
                     job_description=processed_jobs['description']).first()
                 if existing_job is None:
@@ -64,24 +63,24 @@ def scrape_and_process_data(session, model_path):
                                               role_id=db_role.id)
                     add_instance(session, job_posting)
 
-                for skill, skill_type in processed_jobs['skills']:
-                    existing_skill_type = session.query(SkillTypes).filter_by(type_name=skill_type).first()
-                    if existing_skill_type is None:
-                        existing_skill_type = SkillTypes(type_name=skill_type)
-                        add_instance(session, existing_skill_type)
+                    for skill, skill_type in processed_jobs['skills']:
+                        existing_skill_type = session.query(SkillTypes).filter_by(type_name=skill_type).first()
+                        if existing_skill_type is None:
+                            existing_skill_type = SkillTypes(type_name=skill_type)
+                            add_instance(session, existing_skill_type)
 
-                    existing_skill = session.query(Skills).filter_by(skill_name=skill).first()
-                    if existing_skill is None:
-                        existing_skill = Skills(skill_name=skill, type_id=existing_skill_type.id)
-                        add_instance(session, existing_skill)
+                        existing_skill = session.query(Skills).filter_by(skill_name=skill).first()
+                        if existing_skill is None:
+                            existing_skill = Skills(skill_name=skill, type_id=existing_skill_type.id)
+                            add_instance(session, existing_skill)
 
-                    existing_role_skill = session.query(RoleSkills).filter_by(role_id=db_role.id,
-                                                                              skill_id=existing_skill.id).first()
-                    if existing_role_skill:
-                        existing_role_skill.frequency += 1
-                    else:
-                        role_skill = RoleSkills(role_id=db_role.id, skill_id=existing_skill.id, frequency=1)
-                        add_instance(session, role_skill)
+                        existing_role_skill = session.query(RoleSkills).filter_by(role_id=db_role.id,
+                                                                                  skill_id=existing_skill.id).first()
+                        if existing_role_skill:
+                            existing_role_skill.frequency += 1
+                        else:
+                            role_skill = RoleSkills(role_id=db_role.id, skill_id=existing_skill.id, frequency=1)
+                            add_instance(session, role_skill)
 
     driver.quit()
 
