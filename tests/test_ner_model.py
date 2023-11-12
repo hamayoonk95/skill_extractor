@@ -6,7 +6,7 @@ from tests.test_helpers import load_trained_model
 @pytest.fixture(scope="module")
 def nlp():
 
-    model_path = '../models/epoch_35'
+    model_path = '../trained_models/epoch_35'
     return load_trained_model(model_path)
 
 def test_skill_extraction_basic(nlp):

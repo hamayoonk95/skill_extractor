@@ -69,5 +69,5 @@ def write_training_data_to_jsonl(training_data, jsonl_file_path):
 
 def load_training_data_from_jsonl(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
-        TRAIN_DATA = [(json.loads(line)["text"], {"entities": json.loads(line)["label"]}) for line in f]
+        TRAIN_DATA = [(json.loads(line)["text"], {"entities": json.loads(line)["entities"]}) for line in f]
     return TRAIN_DATA

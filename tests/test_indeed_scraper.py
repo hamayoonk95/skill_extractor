@@ -1,5 +1,5 @@
 from unittest.mock import Mock
-from scraping.indeed_scraper import IndeedScraper
+from scraper.scraping.indeed_scraper import IndeedScraper
 from tests.test_helpers import read_sample_html
 
 mock_driver = Mock()

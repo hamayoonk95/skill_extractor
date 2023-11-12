@@ -1,7 +1,7 @@
 import spacy
 
 from unittest.mock import Mock
-from processing.data_processor import DataProcessor
+from scraper.scraping.data_processor import DataProcessor
 
 # Helper function to read HTML templates
 def read_sample_html(file_path):
