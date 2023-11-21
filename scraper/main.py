@@ -1,4 +1,4 @@
-from scraper.utils import (
+from scraper.scraper_utils import (
     setup_driver, load_ner_model, get_or_create_job_role,
     save_job_posting)
 

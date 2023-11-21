@@ -1,5 +1,5 @@
 import datetime
-from utils.utils import load_training_data_from_jsonl
+from train_ner_model.ner_trainer_utils import load_training_data_from_jsonl
 from pathlib import Path
 from train_ner_model.train_ner import train_spacy_model
 
