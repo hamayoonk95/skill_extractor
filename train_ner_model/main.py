@@ -8,7 +8,7 @@ def main():
     training_data = load_training_data_from_jsonl("../training_data/training_data.jsonl")
 
     # Set the base model path and number of iterations
-    base_model_path = '../trained_models/base_model'
+    base_model_path = '../trained_models/base_model/basemodel'
     n_iter = 20
     output_dir = Path('../trained_models/trained_model')
 
@@ -28,6 +28,7 @@ def main():
     # Save the trained model
     nlp.to_disk(output_dir)
     print(f"Saved trained model to {output_dir}")
+    print(time_diff)
 
 
 
