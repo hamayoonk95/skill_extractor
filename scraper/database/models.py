@@ -12,6 +12,7 @@ class JobRole(Base):
     role_title = Column(String(50))
     job_postings = relationship('JobPosting', back_populates='job_role')
     role_skills = relationship('RoleSkill', back_populates='job_role')
+    users = relationship('User', back_populates='job_role')
     projects = relationship('Project', back_populates='job_role')
 
 # Define the JobPosting model
@@ -40,7 +41,7 @@ class Skill(Base):
     type_id = Column(Integer, ForeignKey('skill_types.id'))
     skill_type = relationship('SkillType', back_populates='skills')
     role_skills = relationship('RoleSkill', back_populates='skill')
-    user_skills = relationship('UserSkill', back_populates='skill')
+    # user_skills = relationship('UserSkill', back_populates='skill')
 
 # Define the RoleSkill model
 class RoleSkill(Base):
@@ -57,22 +58,15 @@ class RoleSkill(Base):
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
+    jobrole_id = Column(Integer, ForeignKey('job_roles.id'))
     firstname = Column(String(50))
     lastname = Column(String(50))
     username = Column(String(50))
     email = Column(String(255))
     password = Column(String(255))
-    user_skills = relationship('UserSkill', back_populates='user')
+    # user_skills = relationship('UserSkill', back_populates='user')
+    job_role = relationship('JobRole', back_populates='users')
     projects = relationship('Project', back_populates='user')
-
-# Define the UserSkill model
-class UserSkill(Base):
-    __tablename__ = 'user_skills'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    skill_id = Column(Integer, ForeignKey('skills.id'))
-    user = relationship('User', back_populates='user_skills')
-    skill = relationship('Skill', back_populates='user_skills')
 
 # Define the Project model
 class Project(Base):

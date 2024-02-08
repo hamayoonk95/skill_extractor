@@ -45,8 +45,8 @@ def generate_training_data(description):
             pattern = r'(\b|\s|[,.();])' + re.escape(skill.lower()) + r'(\b|\s|[,.();])'
         for match in re.finditer(pattern, description):
             start, end = match.span()
-            start += len(match.group(1))  # Adjust start index to exclude preceding boundary
-            end -= len(match.group(2))  # Adjust end index to exclude following boundary
+            start += len(match.group(1))
+            end -= len(match.group(2))
 
             if not any(matched_chars[start:end]):
                 entities.append((start, end, category))

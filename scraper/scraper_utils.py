@@ -1,23 +1,23 @@
 import random
 import spacy
-from selenium.webdriver.chrome.options import Options
-from seleniumbase import Driver
+# from selenium.webdriver.chrome.options import Options
+# from webdriver_manager.chrome import ChromeDriverManager
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
 
-from constants.user_agents import user_agent_list
+from seleniumbase import Driver
+from seleniumbase import get_driver
+from fake_useragent import UserAgent
 
 from scraper.database.db_utils import add_instance
-# from scraper.database.models.job_posting import JobPostings
-# from scraper.database.models.job_roles import JobRoles
-# from scraper.database.models.role_skills import RoleSkills
-# from scraper.database.models.skill_types import SkillTypes
-# from scraper.database.models.skills import Skills
 from scraper.database.models import JobRole, JobPosting, RoleSkill, SkillType, Skill
 
 
 def setup_driver():
-    options = Options()
-    options.add_argument(f"user-agent={random.choice(user_agent_list)}")
-    driver = Driver(uc=True)
+    ua = UserAgent
+    user_agent = ua.random
+    # driver = Driver(uc=True, headless=True, agent=user_agent, undetectable=True)
+    driver = get_driver("chrome", headless=False, user_agent=user_agent, undetectable=True)
     return driver
 
 
@@ -42,7 +42,8 @@ def save_job_posting(session, job_data, db_role):
     existing_job = session.query(JobPosting).filter_by(
         job_title=job_data['title'],
         job_description=job_data['description'],
-        company_name=company_name
+        company_name=company_name,
+        role_id =db_role.id
         ).first()
     if not existing_job:
         job_posting = JobPosting(

@@ -7,6 +7,7 @@ class IndeedScraper:
     def __init__(self, driver):
         self.driver = driver
         self.base_url = 'https://uk.indeed.com'
+        self.base_url_us = 'https://www.indeed.com'
 
     def indeed_extractor(self, page, role):
         """
@@ -17,11 +18,11 @@ class IndeedScraper:
         """
 
         # Define URL
-        URL = f"https://uk.indeed.com/jobs?q=Title:({role})&l=UK&start={page}"
-
+        URL = f"{self.base_url}/jobs?q=Title:({role})&l=UK&sort=date&start={page}"
+        # US_URL = f"{self.url_us}/jobs?q=Title:({role})&l=United+States&sort=date&start={page}"
         # Navigate to the URL
         self.driver.get(URL)
-        time.sleep(1)
+        # time.sleep(1)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
         # Find the div containing the job cards
@@ -45,6 +46,15 @@ class IndeedScraper:
 
     def get_job_data(self, job_link):
         self.driver.get(job_link)
-        time.sleep(random.randint(0,1))  # delay to prevent getting blocked by the website
+        time.sleep(random.randint(1,2))  # delay to prevent getting blocked by the website
         job_data = self.driver.page_source  # store the entire page source
         return job_data
+
+    def is_browser_responsive(self):
+        try:
+            # Attempt to retrieve the current URL as a responsiveness check
+            _ = self.driver.current_url
+            print(_)
+            return True
+        except Exception:
+            return False

@@ -37,14 +37,8 @@ SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=db_engine)
 Base = declarative_base()
 
 # Import trained_models after the Base has been created
-# from scraper.database.models import job_roles
-# from scraper.database.models import job_posting
-# from scraper.database.models import skills
-# from scraper.database.models import users
-# from scraper.database.models import skill_types
-# from scraper.database.models import role_skills
-# from scraper.database.models import user_skills
-# from scraper.database.models import projects
+from scraper.database.models import JobRole, JobPosting, SkillType, Skill, RoleSkill, User, Project
+
 
 # Create all the trained_models in the database
 Base.metadata.create_all(bind=db_engine)
