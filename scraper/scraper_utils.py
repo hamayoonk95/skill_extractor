@@ -1,11 +1,6 @@
-import random
+from datetime import datetime
 import spacy
-# from selenium.webdriver.chrome.options import Options
-# from webdriver_manager.chrome import ChromeDriverManager
-# from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
 
-from seleniumbase import Driver
 from seleniumbase import get_driver
 from fake_useragent import UserAgent
 
@@ -43,7 +38,7 @@ def save_job_posting(session, job_data, db_role):
         job_title=job_data['title'],
         job_description=job_data['description'],
         company_name=company_name,
-        role_id =db_role.id
+        role_id=db_role.id
         ).first()
     if not existing_job:
         job_posting = JobPosting(
@@ -92,10 +87,24 @@ def get_or_create_role_skill(session, db_role, db_skill):
     """
     Get an existing role-skill relationship from the database or create it if it doesn't exist.
     """
-    role_skill = session.query(RoleSkill).filter_by(role_id=db_role.id, skill_id=db_skill.id).first()
+
+    # Get the current date
+    current_date = datetime.utcnow().date()
+
+    role_skill = session.query(RoleSkill).filter_by(
+        role_id=db_role.id,
+        skill_id=db_skill.id,
+        date_scraped=current_date
+        ).first()
+
     if role_skill:
         role_skill.frequency += 1
         session.commit()
     else:
-        role_skill = RoleSkill(role_id=db_role.id, skill_id=db_skill.id, frequency=1)
+        role_skill = RoleSkill(
+            role_id=db_role.id,
+            skill_id=db_skill.id,
+            frequency=1,
+            date_scraped=current_date
+            )
         add_instance(session, role_skill)

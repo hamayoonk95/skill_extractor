@@ -7,7 +7,6 @@ class IndeedScraper:
     def __init__(self, driver):
         self.driver = driver
         self.base_url = 'https://uk.indeed.com'
-        self.base_url_us = 'https://www.indeed.com'
 
     def indeed_extractor(self, page, role):
         """
@@ -18,11 +17,9 @@ class IndeedScraper:
         """
 
         # Define URL
-        URL = f"{self.base_url}/jobs?q=Title:({role})&l=UK&sort=date&start={page}"
-        # US_URL = f"{self.url_us}/jobs?q=Title:({role})&l=United+States&sort=date&start={page}"
+        URL = f"{self.base_url}/jobs?q=Title:({role})&l=UK&start={page}"
         # Navigate to the URL
         self.driver.get(URL)
-        # time.sleep(1)
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
         # Find the div containing the job cards

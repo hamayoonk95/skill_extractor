@@ -11,7 +11,11 @@ job_roles = [
     {'role_title': 'System/Network Engineer', 'query': '(System OR Network) Engineer'},
     {'role_title': 'Security Engineer', 'query': '(Cyber OR Information) Security (Engineer OR Analyst OR Specialist OR Consultant OR Manager)'},
     {'role_title': 'DBA', 'query': 'Database Administrator OR DBA'},
-    {'role_title': 'UX/UI Designer', 'query': '(UX OR UI OR User-Experience OR User-Interface) Designer'}, {'role_title': 'System Admin', 'query': 'System Administrator'},
+    {'role_title': 'UX/UI Designer', 'query': '(UX OR UI OR User-Experience OR User-Interface) Designer'},
+    {'role_title': 'System Admin', 'query': 'System Administrator'},
     {'role_title': 'Cloud Architect', 'query': '(Cloud OR AWS OR Azure OR Google Cloud) Architect'},
     {'role_title': 'Solution/Enterprise Developer', 'query': '(Solution OR Enterprise) (Architect OR Developer OR Engineer)'}
 ]
+
+
+
