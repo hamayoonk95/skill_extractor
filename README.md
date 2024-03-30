@@ -1,5 +1,39 @@
-Job Data Scraper
-This is a web scraper to collect job listing data from the web and store it in a database for further analysis.
+# Data Extractor and NER Model
 
-Overview
-The scraper collects job postings from sites like Indeed.com, extracts relevant fields like title, description, skills etc., and saves them to an SQL database.
+##Overview
+The Data Extractor is designed to scrape job descriptions from Indeed, providing a comprehensive dataset for analyzing current job market trends and demands. Utilising a scraping algorithm, it retrieves detailed job postings which are then processed by the NER (Named Entity Recognition) model for skill extraction and categorisation.
+
+##Data Extractor
+
+### Prerequisites
+
+-   Python 3.x
+
+### Running the Data Extractor
+
+1. Open your terminal or command prompt
+2. Navigate to the scraper directory:
+   'cd scraper'
+3. Run the 'main.py' script:
+   'python main.py'
+4. When prompted, enter the NER model's location. The latest model is located at:
+   '../trained_models/trained_model/ner0'
+
+This process will initiate the scraping of job descriptions from Indeed and use the NER model to extract skills from job description.
+
+## NER Model
+
+### Prerequisites
+
+-   Python 3.x
+
+### Running the NER Model
+
+1. Open your terminal or command prompt.
+2. Navigate to the train_ner_model directory:
+   'cd train_ner_model'
+3. Run the `main.py` script to start the training process:
+   'python main.py'
+4. The script uses training data from `../training_data/training_data.jsonl` by default. If you have new training data, update the `training_data` path in the script to your new `.jsonl` file before running.
+
+To generate more training data, use the `generate_training_data(description):` function in `ner_trainer_utils`. This function allows you to input descriptions, which it will then convert into training data. You might need to refine this data further before it's ready for training.
